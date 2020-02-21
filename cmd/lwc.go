@@ -17,18 +17,20 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 
 	"github.com/spf13/cobra"
 )
 
-
-var url string
+var urlFlag string
 
 func init() {
 	rootCmd.AddCommand(lwcCmd)
 
 	// Here you will define your flags and configuration settings.
-	lwcCmd.Flags().StringVarP(&url, "url", "url", "", "URL to get the words or string from")
+	lwcCmd.Flags().StringVarP(&urlFlag, "url", "u", "", "URL to get the words or string from")
 }
 
 // lwcCmd represents the lwc command
@@ -37,7 +39,34 @@ var lwcCmd = &cobra.Command{
 	Short: "find the four least used words and their word count",
 	Long: `fetches the comments data from the supplied url. In the ‘’body’’ field, 
 			finds the four least used words and their word count.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("lwc called")
-	},
+	Run: leastWordCount,
+}
+
+func leastWordCount(cmd *cobra.Command, args []string) {
+	resp, err := fetchURL(urlFlag)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// return error or the computed value from the request body using goroutines
+	fmt.Println(string(resp))
+}
+
+// fetchURL parses the supplied URL and makes a GET request to the URL
+func fetchURL(rawURL string) ([]byte, error) {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := http.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	return body, nil
 }
