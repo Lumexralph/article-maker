@@ -41,6 +41,9 @@ func FetchURL(rawURL string) ([]byte, error) {
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
 
 	return body, nil
 }
@@ -51,7 +54,7 @@ type Comment struct {
 }
 
 // ParseComment encodes the response to a slice of struct
-func ParseComment(body []byte) ([]Comment ,error) {
+func ParseComment(body []byte) ([]Comment, error) {
 	var c []Comment
 
 	err := json.Unmarshal(body, &c)
@@ -76,8 +79,8 @@ func GenerateWordCount(comments []Comment) map[string]int {
 }
 
 type record struct {
-	Word string `json:"word"`
-	Count int `json:"count"`
+	Word  string `json:"word"`
+	Count int    `json:"count"`
 }
 
 // to be able to sort the records
