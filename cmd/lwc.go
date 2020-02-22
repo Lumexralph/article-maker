@@ -25,13 +25,6 @@ import (
 
 var urlFlag string
 
-func init() {
-	rootCmd.AddCommand(lwcCmd)
-
-	// Here you will define your flags and configuration settings.
-	lwcCmd.Flags().StringVarP(&urlFlag, "url", "u", "", "URL to get the words or string from")
-}
-
 // lwcCmd represents the lwc command
 var lwcCmd = &cobra.Command{
 	Use:   "lwc",
@@ -39,6 +32,13 @@ var lwcCmd = &cobra.Command{
 	Long: `fetches the comments data from the supplied url. In the ‘’body’’ field, 
 			finds the four least used words and their word count.`,
 	Run: leastWordCount,
+}
+
+func init() {
+	rootCmd.AddCommand(lwcCmd)
+
+	// Here you will define your flags and configuration settings.
+	lwcCmd.Flags().StringVarP(&urlFlag, "url", "u", "", "URL to get the words or string from")
 }
 
 func leastWordCount(cmd *cobra.Command, args []string) {
