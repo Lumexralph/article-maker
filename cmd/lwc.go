@@ -1,5 +1,5 @@
 /*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+Copyright © 2020 OLUMIDE OGUNDELE <olumideralph@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,17 +18,18 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/Lumexralph/article-maker/pkg"
+
 	"github.com/spf13/cobra"
 )
 
-
-var url string
+var urlFlag string
 
 func init() {
 	rootCmd.AddCommand(lwcCmd)
 
 	// Here you will define your flags and configuration settings.
-	lwcCmd.Flags().StringVarP(&url, "url", "url", "", "URL to get the words or string from")
+	lwcCmd.Flags().StringVarP(&urlFlag, "url", "u", "", "URL to get the words or string from")
 }
 
 // lwcCmd represents the lwc command
@@ -37,7 +38,31 @@ var lwcCmd = &cobra.Command{
 	Short: "find the four least used words and their word count",
 	Long: `fetches the comments data from the supplied url. In the ‘’body’’ field, 
 			finds the four least used words and their word count.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("lwc called")
-	},
+	Run: leastWordCount,
+}
+
+func leastWordCount(cmd *cobra.Command, args []string) {
+	resp, err := pkg.FetchURL(urlFlag)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	c, err := pkg.ParseComment(resp)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// generate the word counts
+	records := pkg.GenerateWordCount(c)
+	// get the least common words
+	wordRecords := pkg.LeastCommonWords(records, 4)
+	b, err := pkg.WordCountToJSON(wordRecords)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(string(b))
 }
