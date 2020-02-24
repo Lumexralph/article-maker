@@ -5,7 +5,7 @@ package domain
 import "time"
 
 type Article struct {
-	ID    int    `json:"-"`
+	ID    int
 	Title string `json:"title"`
 	Body  string `json:"body"` // get just the body field
 	Publisher

@@ -20,12 +20,28 @@ func (as *ArticleService) createArticleHandler(w http.ResponseWriter, r *http.Re
 		http.Error(w, http.StatusText(500), 500)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprintf(w, "%s", body)
 }
 
 func (as *ArticleService) updateArticleHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Ready to update article\n")
+	body, _ := ioutil.ReadAll(r.Body)
+	var a domain.Article
+
+	_ = json.Unmarshal(body, &a)
+
+	// insert the values in the DB
+	if err := as.store.ModifyArticle(&a); err != nil {
+		fmt.Println(err)
+		http.Error(w, http.StatusText(500), 500)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "%s", body)
 }
 
 func (as *ArticleService) listArticlesHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +61,7 @@ func (as *ArticleService) listArticlesHandler(w http.ResponseWriter, r *http.Req
 	w.Write(b)
 }
 
-func  (as *ArticleService) retrieveArticleHandler(w http.ResponseWriter, r *http.Request) {
+func (as *ArticleService) retrieveArticleHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 

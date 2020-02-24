@@ -55,7 +55,7 @@ func (a ArticleStore) CreateArticle(article *domain.Article) error {
 			return err
 		}
 	}
-	fmt.Println(c.Name, p.Name)
+
 	// create an article
 	sqlStatement = `INSERT INTO article (title, body, category, publisher, created_at, published_at, deleted)
  					VALUES 
@@ -73,6 +73,56 @@ func (a ArticleStore) CreateArticle(article *domain.Article) error {
 		fmt.Println(err)
 		return err
 	}
+	return nil
+}
+
+func (a ArticleStore) ModifyArticle(article *domain.Article) error {
+	// create category if does not exist
+	sqlStatement := `SELECT * FROM category WHERE name=$1;`
+	row := a.DB.QueryRow(sqlStatement, article.Category.Name)
+	c := new(domain.Category)
+	err := row.Scan(&c.ID, &c.Name)
+	if err == sql.ErrNoRows {
+		sqlStatement := `INSERT INTO category (name) 
+						VALUES ($1);`
+		if _, err := a.DB.Exec(sqlStatement, article.Category.Name); err != nil {
+			return err
+		}
+	}
+
+	// create publisher if it does not exist
+	sqlStatement = `SELECT * FROM publisher WHERE name=$1;`
+	row = a.DB.QueryRow(sqlStatement, article.Publisher.Name)
+	p := new(domain.Publisher)
+	err = row.Scan(&p.ID, &p.Name)
+	if err == sql.ErrNoRows {
+		sqlStatement := `INSERT INTO publisher (name) 
+						VALUES 
+						($1);`
+		if _, err := a.DB.Exec(sqlStatement, article.Publisher.Name); err != nil {
+			return err
+		}
+	}
+
+	sqlStatement = `
+	UPDATE article
+	SET title = $2, body = $3, category = $4, publisher = $5, created_at = $6, published_at = $7, deleted = $8
+	WHERE id = $1;`
+	_, err = a.DB.Exec(
+		sqlStatement,
+		article.ID,
+		article.Title,
+		article.Body,
+		article.Category.Name,
+		article.Publisher.Name,
+		article.CreatedAt,
+		article.PublishedAt,
+		article.Deleted,
+	)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
