@@ -18,18 +18,19 @@ func CreateClient(psqlInfo string) (*sql.DB, error){
 	return db, nil
 }
 
-// DB encapsulates a db connection with the operations
-type PostgresRepository struct {
-	db *sql.DB
-	table string
+// PostgresRepository encapsulates a db connection with the operations
+type ArticleStore struct {
+	DB *sql.DB
+	Table string
 }
 
 // CreateFileMetaData will take the data from the stored file
 // and persist it to the database
-func (pg *PostgresRepository) CreateArticle(article *domain.Article) {
-	sqlStatement := `INSERT INTO ` + pg.table  + ` (name, slug, format, path, size)
-	VALUES ($1, $2, $3, $4, $5)`
-	if _, err := pg.db.Exec(sqlStatement, article., fd.slug, fd.format, fd.path, fd.size); err != nil {
-		panic(err)
-	}
+func (a ArticleStore) CreateArticle(article *domain.Article) error {
+	//sqlStatement := `INSERT INTO ` + a.Table  + ` (name, slug, format, path, size)
+	//VALUES ($1, $2, $3, $4, $5)`
+	//if _, err := a.db.Exec(sqlStatement, article., fd.slug, fd.format, fd.path, fd.size); err != nil {
+	//	panic(err)
+	//}
+	return nil
 }

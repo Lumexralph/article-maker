@@ -17,9 +17,13 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/Lumexralph/article-maker/internal/postgres"
 	"github.com/spf13/cobra"
-	"log"
 	"net/http"
+	"os"
+
+	articleserver "github.com/Lumexralph/article-maker/pkg/server"
+	log "github.com/golang/glog"
 )
 
 var portFlag string
@@ -50,9 +54,45 @@ func init() {
 func server(cmd *cobra.Command, args []string) {
 	fmt.Println(portFlag)
 	//port := os.Getenv("PORT")
-	log.Printf("Starting server on port: %s \n", portFlag)
-	err := http.ListenAndServe(":"+portFlag, nil)
+
+	// start the service
+	log.Infof("Starting server on port: %s \n", portFlag)
+
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+	sslmode := os.Getenv("DB_SSLMODE")
+
+	// create database url
+	connStr := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		host,
+		port,
+		user,
+		password,
+		dbname,
+		sslmode,
+		)
+
+	db, err := postgres.CreateClient(connStr)
 	if err != nil {
-		fmt.Println(err)
+		log.Info(err)
 	}
+
+	// article service datastore
+	articleStore := postgres.ArticleStore{
+		DB: db,
+		Table: "article",
+	}
+
+	// create new article service
+	serv := articleserver.New(articleStore)
+
+	err = http.ListenAndServe(":"+portFlag, serv)
+	if err != nil {
+		log.Info(err)
+	}
+
 }
