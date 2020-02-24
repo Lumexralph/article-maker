@@ -77,7 +77,7 @@ func server(cmd *cobra.Command, args []string) {
 		password,
 		dbname,
 		sslmode,
-		)
+	)
 
 	db, err := postgres.CreateClient(connStr)
 	if err != nil {
@@ -86,7 +86,7 @@ func server(cmd *cobra.Command, args []string) {
 
 	// article service datastore
 	articleStore := postgres.ArticleStore{
-		DB: db,
+		DB:    db,
 		Table: "article",
 	}
 

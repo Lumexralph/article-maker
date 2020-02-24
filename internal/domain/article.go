@@ -5,18 +5,22 @@ package domain
 import "time"
 
 type Article struct {
-	title, body, category, publisher string
-
-	createdAt, publishedAt time.Time
-
-	Category
+	ID    int    `json:"-"`
+	Title string `json:"title"`
+	Body  string `json:"body"` // get just the body field
 	Publisher
+	Category
+	CreatedAt   time.Time `json:"created_at"`
+	PublishedAt time.Time `json:"published_at"`
+	Deleted     bool      `json:"-"`
 }
 
 type Category struct {
-	name string
+	ID   int    `json:"-"`
+	Name string `json:"category"`
 }
 
 type Publisher struct {
-	firstName, lastName string
+	ID   int    `json:"-"`
+	Name string `json:"publisher"`
 }

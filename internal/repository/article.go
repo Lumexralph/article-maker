@@ -10,6 +10,6 @@ import (
 
 // ClientRepository interface that any database implementation have to provide
 type ArticleRepository interface {
-	//create an article struct to be passed
-	CreateArticle(*domain.Article) error
+	CreateArticle(*domain.Article) error      //create an article struct to be passed
+	ListArticles() ([]*domain.Article, error) //list an article struct to be passed
 }
