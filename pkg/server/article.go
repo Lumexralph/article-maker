@@ -28,8 +28,8 @@ func (as *ArticleService) Router() *mux.Router {
 	// TODO: Try to remove trailing slash for request like /article/
 	r := mux.NewRouter()
 
-	r.HandleFunc("/article/{id}", retrieveAnArticleHandler).Methods("GET")
-	r.HandleFunc("/article/{id}", removeAnArticleHandle).Methods("DELETE")
+	r.HandleFunc("/article/{id}", as.retrieveArticleHandler).Methods("GET")
+	r.HandleFunc("/article/{id}", as.removeAnArticleHandle).Methods("DELETE")
 	r.HandleFunc("/article", as.listArticlesHandler).Methods("GET")
 	r.HandleFunc("/article", as.updateArticleHandler).Methods("PUT")
 	r.HandleFunc("/article", as.createArticleHandler).Methods("POST")

@@ -12,4 +12,6 @@ import (
 type ArticleRepository interface {
 	CreateArticle(*domain.Article) error      //create an article struct to be passed
 	ListArticles() ([]*domain.Article, error) //list an article struct to be passed
+	GetArticle(id string) (*domain.Article, error) // get an article by ID
+	DeleteArticle(id string) error // delete an article using the id
 }

@@ -44,7 +44,6 @@ func (a ArticleStore) CreateArticle(article *domain.Article) error {
 
 	// create publisher if it does not exist
 	sqlStatement = `SELECT * FROM publisher WHERE name=$1;`
-
 	row = a.DB.QueryRow(sqlStatement, article.Publisher.Name)
 	p := new(domain.Publisher)
 	err = row.Scan(&p.ID, &p.Name)
@@ -87,7 +86,6 @@ func (a ArticleStore) ListArticles() ([]*domain.Article, error) {
 	articles := make([]*domain.Article, 0)
 	for rows.Next() {
 		a := new(domain.Article)
-		//title, body, category, publisher, created_at, published_at, deleted
 		err := rows.Scan(&a.Title, &a.Body, &a.Category.Name, &a.Publisher.Name, &a.CreatedAt, &a.PublishedAt, &a.Deleted)
 		if err != nil {
 			return nil, err
@@ -95,4 +93,26 @@ func (a ArticleStore) ListArticles() ([]*domain.Article, error) {
 		articles = append(articles, a)
 	}
 	return articles, nil
+}
+
+func (a ArticleStore) GetArticle(id string) (*domain.Article, error) {
+	sqlStatement := `SELECT title, body, category, publisher, created_at, published_at, deleted FROM article WHERE id=$1;`
+	row := a.DB.QueryRow(sqlStatement, id)
+	da := new(domain.Article)
+	err := row.Scan(&da.Title, &da.Body, &da.Category.Name, &da.Publisher.Name, &da.CreatedAt, &da.PublishedAt, &da.Deleted)
+	if err == sql.ErrNoRows {
+		return nil, err
+	}
+
+	return da, nil
+}
+
+func (a ArticleStore) DeleteArticle(id string) error {
+	sqlStatement := `DELETE FROM article WHERE id=$1;`
+	_, err := a.DB.Exec(sqlStatement, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

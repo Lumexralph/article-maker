@@ -45,17 +45,37 @@ func (as *ArticleService) listArticlesHandler(w http.ResponseWriter, r *http.Req
 	w.Write(b)
 }
 
-func retrieveAnArticleHandler(w http.ResponseWriter, r *http.Request) {
+func  (as *ArticleService) retrieveArticleHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	fmt.Fprintf(w, "Get an article by id %s!\n", id)
+	a, err := as.store.GetArticle(id)
+	if err != nil {
+		http.Error(w, http.StatusText(404), 404)
+		return
+	}
+
+	b, err := json.MarshalIndent(a, "", "\t")
+	if err != nil {
+		http.Error(w, http.StatusText(500), 500)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
 }
 
-func removeAnArticleHandle(w http.ResponseWriter, r *http.Request) {
+func (as *ArticleService) removeAnArticleHandle(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	fmt.Println("the method >>> ", r.Method, id)
 
-	fmt.Fprintf(w, "Delete an article by id %s!\n", id)
+	err := as.store.DeleteArticle(id)
+	if err != nil {
+		http.Error(w, http.StatusText(404), 404)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, "Article successfully deleted")
 }
