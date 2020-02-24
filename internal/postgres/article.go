@@ -29,35 +29,18 @@ type ArticleStore struct {
 // CreateArticle will take the data from the stored file
 // and persist it to the database
 func (a ArticleStore) CreateArticle(article *domain.Article) error {
-	// create category if does not exist
-	sqlStatement := `SELECT * FROM category WHERE name=$1;`
-	row := a.DB.QueryRow(sqlStatement, article.Category.Name)
-	c := new(domain.Category)
-	err := row.Scan(&c.ID, &c.Name)
-	if err == sql.ErrNoRows {
-		sqlStatement := `INSERT INTO category (name) 
-						VALUES ($1);`
-		if _, err := a.DB.Exec(sqlStatement, article.Category.Name); err != nil {
-			return err
-		}
+	err := a.createOrRetriveCategory(article.Category.Name)
+	if err != nil {
+		return err
 	}
 
-	// create publisher if it does not exist
-	sqlStatement = `SELECT * FROM publisher WHERE name=$1;`
-	row = a.DB.QueryRow(sqlStatement, article.Publisher.Name)
-	p := new(domain.Publisher)
-	err = row.Scan(&p.ID, &p.Name)
-	if err == sql.ErrNoRows {
-		sqlStatement := `INSERT INTO publisher (name) 
-						VALUES 
-						($1);`
-		if _, err := a.DB.Exec(sqlStatement, article.Publisher.Name); err != nil {
-			return err
-		}
+	err = a.createOrRetrievePublisher(article.Publisher.Name)
+	if err != nil {
+		return err
 	}
 
 	// create an article
-	sqlStatement = `INSERT INTO article (title, body, category, publisher, created_at, published_at, deleted)
+	sqlStatement := `INSERT INTO article (title, body, category, publisher, created_at, published_at, deleted)
  					VALUES 
  					($1, $2, $3, $4, $5, $6, $7);`
 	if _, err := a.DB.Exec(
@@ -77,34 +60,17 @@ func (a ArticleStore) CreateArticle(article *domain.Article) error {
 }
 
 func (a ArticleStore) ModifyArticle(article *domain.Article) error {
-	// create category if does not exist
-	sqlStatement := `SELECT * FROM category WHERE name=$1;`
-	row := a.DB.QueryRow(sqlStatement, article.Category.Name)
-	c := new(domain.Category)
-	err := row.Scan(&c.ID, &c.Name)
-	if err == sql.ErrNoRows {
-		sqlStatement := `INSERT INTO category (name) 
-						VALUES ($1);`
-		if _, err := a.DB.Exec(sqlStatement, article.Category.Name); err != nil {
-			return err
-		}
+	err := a.createOrRetriveCategory(article.Category.Name)
+	if err != nil {
+		return err
 	}
 
-	// create publisher if it does not exist
-	sqlStatement = `SELECT * FROM publisher WHERE name=$1;`
-	row = a.DB.QueryRow(sqlStatement, article.Publisher.Name)
-	p := new(domain.Publisher)
-	err = row.Scan(&p.ID, &p.Name)
-	if err == sql.ErrNoRows {
-		sqlStatement := `INSERT INTO publisher (name) 
-						VALUES 
-						($1);`
-		if _, err := a.DB.Exec(sqlStatement, article.Publisher.Name); err != nil {
-			return err
-		}
+	err = a.createOrRetrievePublisher(article.Publisher.Name)
+	if err != nil {
+		return err
 	}
 
-	sqlStatement = `
+	sqlStatement := `
 	UPDATE article
 	SET title = $2, body = $3, category = $4, publisher = $5, created_at = $6, published_at = $7, deleted = $8
 	WHERE id = $1;`
@@ -164,5 +130,39 @@ func (a ArticleStore) DeleteArticle(id string) error {
 		return err
 	}
 
+	return nil
+}
+
+func (a ArticleStore) createOrRetriveCategory(category string) error {
+	// create category if does not exist
+	sqlStatement := `SELECT * FROM category WHERE name=$1;`
+	row := a.DB.QueryRow(sqlStatement, category)
+	c := new(domain.Category)
+	err := row.Scan(&c.ID, &c.Name)
+	if err == sql.ErrNoRows {
+		sqlStatement := `INSERT INTO category (name) 
+						VALUES ($1);`
+		if _, err := a.DB.Exec(sqlStatement, category); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (a ArticleStore) createOrRetrievePublisher(publisher string) error {
+	// create publisher if it does not exist
+	sqlStatement := `SELECT * FROM publisher WHERE name=$1;`
+	row := a.DB.QueryRow(sqlStatement, publisher)
+	p := new(domain.Publisher)
+	err := row.Scan(&p.ID, &p.Name)
+	if err == sql.ErrNoRows {
+		sqlStatement := `INSERT INTO publisher (name) 
+						VALUES 
+						($1);`
+		if _, err := a.DB.Exec(sqlStatement, publisher); err != nil {
+			return err
+		}
+	}
 	return nil
 }
