@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/Lumexralph/article-maker/internal/postgres"
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"net/http"
 	"os"
@@ -52,8 +53,10 @@ func init() {
 }
 
 func server(cmd *cobra.Command, args []string) {
-	fmt.Println(portFlag)
-	//port := os.Getenv("PORT")
+	err := godotenv.Load()
+	if err != nil {
+		log.Info("Could not load env. file...")
+	}
 
 	// start the service
 	log.Infof("Starting server on port: %s \n", portFlag)

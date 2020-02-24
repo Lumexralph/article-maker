@@ -8,4 +8,15 @@ type Article struct {
 	title, body, category, publisher string
 
 	createdAt, publishedAt time.Time
+
+	Category
+	Publisher
+}
+
+type Category struct {
+	name string
+}
+
+type Publisher struct {
+	firstName, lastName string
 }

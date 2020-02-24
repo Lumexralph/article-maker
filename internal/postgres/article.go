@@ -5,6 +5,8 @@ package postgres
 import (
 	"database/sql"
 	"github.com/Lumexralph/article-maker/internal/domain"
+	// register driver needed for postgreSQL
+	_ "github.com/lib/pq"
 )
 
 // CreateClient will create a new database connection with the supplied psqlInfo
