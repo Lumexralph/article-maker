@@ -65,7 +65,17 @@ Get a specific article by id | GET | /article/:id
 Delete a specific article | DELETE | /article/:id
 
 
-For the api, you'll need a postgres database.
+For the api, you'll need a postgres database with an env. file
+
+## Documentation on the code
+Run:
+
+    godoc --http=:8080  // visit the URL in the browser
+ 
+To run tests, run:
+
+    go tests // in any package with test file
+      
 ## Errors and bugs
 
 If something is not behaving intuitively, it is a bug and should be reported.
