@@ -1,5 +1,4 @@
-// Package server has the implementation for the
-// article request handlers.
+// Package server has the implementation for the article request handlers.
 package server
 
 import (
@@ -19,6 +18,7 @@ func New(s repository.ArticleRepository) *ArticleService {
 	}
 }
 
+// ServeHTTP helps to implement the ListenAndServe interface
 func (as *ArticleService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	as.Router().ServeHTTP(w, r)
 }

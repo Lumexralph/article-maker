@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/Lumexralph/article-maker/internal/domain"
+	"time"
 
 	// register driver needed for postgreSQL
 	_ "github.com/lib/pq"
@@ -23,7 +24,6 @@ func CreateClient(psqlInfo string) (*sql.DB, error) {
 // PostgresRepository encapsulates a db connection with the operations
 type ArticleStore struct {
 	DB    *sql.DB
-	Table string
 }
 
 // CreateArticle will take the data from the stored file
@@ -93,7 +93,9 @@ func (a ArticleStore) ModifyArticle(article *domain.Article) error {
 }
 
 func (a ArticleStore) ListArticles() ([]*domain.Article, error) {
-	rows, err := a.DB.Query("SELECT title, body, category, publisher, created_at, published_at, deleted FROM article")
+	sqlStatement := `SELECT * 
+					 FROM article`
+	rows, err := a.DB.Query(sqlStatement)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +104,33 @@ func (a ArticleStore) ListArticles() ([]*domain.Article, error) {
 	articles := make([]*domain.Article, 0)
 	for rows.Next() {
 		a := new(domain.Article)
-		err := rows.Scan(&a.Title, &a.Body, &a.Category.Name, &a.Publisher.Name, &a.CreatedAt, &a.PublishedAt, &a.Deleted)
+		err := rows.Scan(&a.ID, &a.Title, &a.Body, &a.Category.Name, &a.Publisher.Name, &a.CreatedAt, &a.PublishedAt, &a.Deleted)
+		if err != nil {
+			return nil, err
+		}
+		articles = append(articles, a)
+	}
+	return articles, nil
+}
+
+func (a ArticleStore) ListArticlesByParameter(fields ...interface{}) ([]*domain.Article, error) {
+	sqlStatement := `SELECT * 
+					FROM article
+					WHERE 
+						category = $1 OR 
+						publisher = $2 OR 
+						created_at = $3 OR 
+						published_at = $4;`
+	rows, err := a.DB.Query(sqlStatement, fields...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	articles := make([]*domain.Article, 0)
+	for rows.Next() {
+		a := new(domain.Article)
+		err := rows.Scan(&a.ID, &a.Title, &a.Body, &a.Category.Name, &a.Publisher.Name, &a.CreatedAt, &a.PublishedAt, &a.Deleted)
 		if err != nil {
 			return nil, err
 		}
@@ -165,4 +193,29 @@ func (a ArticleStore) createOrRetrievePublisher(publisher string) error {
 		}
 	}
 	return nil
+}
+
+// NewNullString helps to create a NULL value in sql query
+// if the field is empty
+func NewNullString(s string) sql.NullString {
+	if len(s) == 0 {
+		return sql.NullString{}
+	}
+	return sql.NullString{
+		String: s,
+		Valid: true,
+	}
+}
+
+// NewNullTime helps to create a NULL value in sql query
+// if the time field is empty
+func NewNullTime(s string) sql.NullTime {
+	if len(s) == 0 {
+		return sql.NullTime{}
+	}
+	t, _ := time.Parse(time.RFC3339, s)
+	return sql.NullTime{
+		Time: t,
+		Valid: true,
+	}
 }

@@ -33,8 +33,9 @@ var portFlag string
 var serverCmd = &cobra.Command{
 	Use:   "server",
 	Short: "start the server to expose the APIs",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:`,
+	Long: `server sub-command starts a server on the provided port to
+			listen from and supplies endpoints to perform different
+			operations with articles.`,
 	Run: server,
 }
 
@@ -83,6 +84,7 @@ func server(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Info(err)
 	}
+	defer db.Close()
 
 	// article service datastore
 	articleStore := postgres.ArticleStore{
