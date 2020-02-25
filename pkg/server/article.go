@@ -1,5 +1,4 @@
-// Package server has the implementation for the
-// article request handlers.
+// Package server has the implementation for the article request handlers.
 package server
 
 import (
@@ -19,6 +18,7 @@ func New(s repository.ArticleRepository) *ArticleService {
 	}
 }
 
+// ServeHTTP helps to implement the ListenAndServe interface
 func (as *ArticleService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	as.Router().ServeHTTP(w, r)
 }
@@ -29,7 +29,7 @@ func (as *ArticleService) Router() *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/article/{id}", as.retrieveArticleHandler).Methods("GET")
-	r.HandleFunc("/article/{id}", as.removeAnArticleHandle).Methods("DELETE")
+	r.HandleFunc("/article/{id}", as.removeAnArticleHandler).Methods("DELETE")
 	r.HandleFunc("/article", as.listArticlesHandler).Methods("GET")
 	r.HandleFunc("/article", as.updateArticleHandler).Methods("PUT")
 	r.HandleFunc("/article", as.createArticleHandler).Methods("POST")
