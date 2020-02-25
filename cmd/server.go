@@ -88,8 +88,7 @@ func server(cmd *cobra.Command, args []string) {
 
 	// article service datastore
 	articleStore := postgres.ArticleStore{
-		DB:    db,
-		Table: "article",
+		DB: db,
 	}
 
 	// create new article service

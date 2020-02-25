@@ -65,7 +65,7 @@ func (as *ArticleService) listArticlesHandler(w http.ResponseWriter, r *http.Req
 			postgres.NewNullString(p),
 			postgres.NewNullTime(ct),
 			postgres.NewNullTime(pt),
-			)
+		)
 	} else {
 		articles, err = as.store.ListArticles()
 	}
@@ -107,7 +107,7 @@ func (as *ArticleService) retrieveArticleHandler(w http.ResponseWriter, r *http.
 	w.Write(b)
 }
 
-func (as *ArticleService) removeAnArticleHandle(w http.ResponseWriter, r *http.Request) {
+func (as *ArticleService) removeAnArticleHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 

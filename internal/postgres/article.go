@@ -23,7 +23,7 @@ func CreateClient(psqlInfo string) (*sql.DB, error) {
 
 // PostgresRepository encapsulates a db connection with the operations
 type ArticleStore struct {
-	DB    *sql.DB
+	DB *sql.DB
 }
 
 // CreateArticle will take the data from the stored file
@@ -203,7 +203,7 @@ func NewNullString(s string) sql.NullString {
 	}
 	return sql.NullString{
 		String: s,
-		Valid: true,
+		Valid:  true,
 	}
 }
 
@@ -215,7 +215,7 @@ func NewNullTime(s string) sql.NullTime {
 	}
 	t, _ := time.Parse(time.RFC3339, s)
 	return sql.NullTime{
-		Time: t,
+		Time:  t,
 		Valid: true,
 	}
 }
